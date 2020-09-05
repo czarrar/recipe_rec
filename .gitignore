@@ -1,5 +1,6 @@
 # Don't include the raw data here
 data/
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
