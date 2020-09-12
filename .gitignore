@@ -1,6 +1,7 @@
 # Don't include the raw data here
 data/
 .DS_Store
+.obsidian
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
