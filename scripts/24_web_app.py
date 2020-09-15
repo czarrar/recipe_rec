@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from recipe_rec import RecipeRec
+import numpy as np
 import traceback
 
 app = Flask(__name__)
@@ -23,11 +24,23 @@ def proximity_form():
                   <input type="submit" value="Submit"><br>
               </form>'''
     if request.method == 'POST':
-        nearest_recipe = recs.proximity_model(request.form['ingredients']) #dict
-        name = list(nearest_recipe.keys())[0]
-        val = list(nearest_recipe.values())[0]
+        # Save the input ingredients
         ret = ret.format(request.form['ingredients'])
-        ret = ret + '<h2>Nearest Recipe</h2><p><b>{}:</b> {}</p>'.format(name, val)
+
+        # Get the nearest recipe
+        nearest_recipe = recs.proximity_model(request.form['ingredients'])
+        d = nearest_recipe.iloc[0,:].to_dict()
+        d['ave_rating'] = np.round(d['ave_rating'], 1)
+
+        # Template html output
+        out = '<h2>Nearest Recipe</h2>\
+                <img src="{img_path}" />\
+                <p><b>Name:</b> {name}</p>\
+                <p><b>Ingredients:</b> {ingredients}</p>\
+                <p><b>Ave Rating:</b> {ave_rating} stars (out of {num_reviews} reviews)</p>'
+
+        # Add to html output
+        ret = ret + out.format(**d)
         #request2 = requests.post(request.form)
         #ret.format(ingredients = request2.json['ingredients'])
     else:
