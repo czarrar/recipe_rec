@@ -3,13 +3,13 @@ import os
 os.chdir('/Users/czarrar/Dropbox/Circle/Jerb/recipe_rec/scripts')
 
 import recipe_rec
-#import importlib
+import importlib
 recipe_rec = importlib.reload(recipe_rec)
 
 # %% Read in ingredients
-recipe_file = '../data/20_ingredients.csv'
+recipe_file = '../data/30_ingredients+ave_ratings.csv'
 recs = recipe_rec.RecipeRec()
-recs.load_from_csv(recipe_file)
+recs.load_from_csv(recipe_file, index_col=0)
 
 # %% Apply TFIDF
 recs.fit_model()
@@ -34,4 +34,10 @@ test_recipes = [
 ]
 tmp = recs.proximity_model(test_recipes[0], to_clean=False)
 tmp
-tmp.values()
+
+d = tmp.iloc[0,:].to_dict()
+d
+
+"{name}: {ingredients}".format(**d)
+
+recs.recipes.recipe_id.min()

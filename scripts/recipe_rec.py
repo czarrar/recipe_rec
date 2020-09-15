@@ -97,7 +97,7 @@ class RecipeRec(object):
     """Recipe Recommendations"""
     def __init__(self):
         self.model = Tfidf_Wrapper()
-        self.ingredients = None
+        self.recipes = None
         self.nlp = spacy.load('en_core_web_sm')
         return
 
@@ -106,24 +106,18 @@ class RecipeRec(object):
         items = [ token.text for token in doc
             if token.is_stop != True    # no stop words
             and token.pos_ != 'VERB'    # no verbs
-            and (token.text == '^' or token.is_punct != True)  # no punctuation
+            and token.is_punct != True  # no punctuation
             and token.is_digit != True  # no digits
         ]
         ingredients = ' '.join(items)
         return ingredients
 
-    def load_from_csv(self, recipe_file, to_clean=False):
+    def load_from_csv(self, recipe_file, to_clean=False, *args, **kwargs):
         # recipe_file = ../data/20_ingredients.csv
-        recipes = pd.read_csv(recipe_file)
+        self.recipes = pd.read_csv(recipe_file, *args, **kwargs)
         if to_clean:
-            ingredients = [ self._clean_ingredients(ingredients) for ingredients in recipes.ingredients ]
-            ingredients = [ x.replace('^', ', ') for x in ingredients ]
-        else:
-            # Change '^' to a comma and get out a list of recipe ingredients
-            ingredients = [ x.replace('^', ', ') for x in recipes.ingredients ]
-        self.ingredients = np.array(ingredients)
-        self.recipe_names = recipes.recipe_name
-        self.recipe_ids = recipes.recipe_id
+            ingredients = [ self._clean_ingredients(ingredients) for ingredients in self.recipes.ingredients ]
+            self.recipes['ingredients'] = ingredients
         return
 
     def save_model(self, ofile):
@@ -135,9 +129,9 @@ class RecipeRec(object):
         return cls
 
     def fit_model(self):
-        if self.ingredients is None:
+        if self.recipes is None:
             raise Exception('Please load and build the model first')
-        self.model.fit_transform(self.ingredients)
+        self.model.fit_transform(self.recipes.ingredients)
         return
 
     def vectorize_ingredients(self, str_ingredients):
@@ -150,7 +144,30 @@ class RecipeRec(object):
     # Process: Use nearest neighbor approach to find recipes most similar to input
     # Output: List of most similar recipes in ranked order
     def proximity_model(self, str_ingredients, top_n=1, to_clean=False):
+        """
+        Takes ingredients for a recipe and returns the closest recipes in the
+        current recipe book.
+
+        Parameters
+        ----------
+        str_ingredients : str
+            Search for the nearest recipe with the following ingredients
+
+        top_n : int
+            How many results to return (default: 1)
+
+        to_clean : bool
+            If you want to clean the output ingredients (default: False)
+            This includes: removing characters, stop words, puntuations, digits,
+            and verbs.
+
+        Returns
+        -------
+        recipe_ids : pd.Series
+        """
         # Todo: check that str_ingredients is a string
+        if type(str_ingredients) != str:
+            raise Exception("Input type must be string")
 
         # Vectorize the input ingredients
         vec_ingredients = self.vectorize_ingredients([str_ingredients])
@@ -164,10 +181,14 @@ class RecipeRec(object):
         # Get the x top ingredients
         nearest_ingredients = []
 
-        # Clean via tokenizer
-        if to_clean:
-            nearest_ingredients = { self.recipe_names[i] : self._clean_ingredients(str(self.ingredients[i])) for i in inds[:top_n] }
-        else:
-            nearest_ingredients = { self.recipe_names[i] : str(self.ingredients[i]) for i in inds[:top_n] }
+        # Get the recipes
+        nearest_recipes = self.recipes.iloc[inds[:top_n],:]
 
-        return(nearest_ingredients)
+        # Clean the ingredients
+        if to_clean:
+            nearest_recipes['ingredients'] = [
+                self._clean_ingredients(txt)
+                    for txt in nearest_recipes.ingredients
+            ]
+
+        return nearest_recipes
