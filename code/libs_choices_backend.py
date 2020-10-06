@@ -71,33 +71,15 @@ class PairedChoices(object):
         return(formatted_pairs)
 
 
-
-class RecommendRecipes(object):
+class SimulateChoices(object):
     '''
-    Recommend 3 recipes for a user.
+    This simulates the pairwise choices based on rating data
     '''
 
-    def __init__(self):
-        self.recs = RecipeRec.load_model('z_model.p')
+    def fit(self, ratings):
+        if (len(ratings) % 2) == 1:
+            rating = rating[:-1]
 
-        self.recipes = self.recs.recipes
-        self.recipes['group'] = np.loadtxt('z_kmeans25.txt')
-        self.recipes['group'] = self.recipes.group.astype('category')
-        self.n_recipes = self.recipes.shape[0]
-
-
-    def topk(self, k=3):
-        '''Returns a dict or json of the k recipes to recommend.'''
-        # Imagine our only prior are the average prior ratings
-
-        # Let's select some top subset of the recipes
-        inds = (self.recipes.ave_rating > 4.5) & (self.recipes.num_reviews > 100)
-        recipes_select = self.recipes[inds]
-
-        # Of that subset, we randomly select the recipes to show the user
-        # Return a list of dictionaries
-        rids = np.random.choice(recipes_select.index, k, replace=False)
-        scols = ['recipe_id', 'name', 'ingredients', 'img_path']
-        recipes_to_show = recipes_select.loc[rids,scols].to_dict('records')
-
-        return recipes_to_show
+        choices = np.array(rating).reshape(len(rating)//2, 2)
+        diffs = choices[:,0] - choices[:,1]
+        diffs[diffs==0] =

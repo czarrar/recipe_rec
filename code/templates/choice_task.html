@@ -1,0 +1,28 @@
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }}</title>
+        {% else %}
+        <title>Choose Recipes</title>
+        {% endif %}
+        <!-- jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+
+        <!-- jsPsych Code -->
+        <script src="{{ url_for('static', filename='jspsych-6.1.0/jspsych.js') }}"></script>
+        <script src="{{ url_for('static', filename='jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js') }}"></script>
+        <script src="{{ url_for('static', filename='jspsych-6.1.0/plugins/jspsych-categorize-html.js') }}"></script>
+        <script src="{{ url_for('static', filename='jspsych-6.1.0/plugins/jspsych-call-function.js') }}"></script>
+        <script src="{{ url_for('static', filename='jspsych-6.1.0/plugins/jspsych-fullscreen.js') }}"></script>
+        <link href="{{ url_for('static', filename='jspsych-6.1.0/css/jspsych.css') }}" rel="stylesheet" type="text/css">
+
+        <!-- My Own CSS/JS Code -->
+        <script src="{{ url_for('static', filename='a_funs.js') }}"></script>
+        <script src="{{ url_for('static', filename='a_script.js') }}" ></script>
+        <link href="{{ url_for('static', filename='a_style.css') }}" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+    </body>
+</html>

@@ -22,3 +22,10 @@ prior_choices = {
     ],
     'session_id': 'XYZ'
 }
+
+
+
+
+# %% Play with next
+rr = libs_choices_backend.RecommendRecipes()
+rr.topk()

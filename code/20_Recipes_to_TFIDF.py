@@ -22,3 +22,5 @@ recs.save_model("z_model.p")
 import numpy as np
 recs2 = libs_recipe_recs.RecipeRec.load_model('z_model.p')
 np.all(recs.model.features == recs2.model.features)
+
+recs2.recipes.query('recipe_id == 233786').ingredients.tolist()[0]

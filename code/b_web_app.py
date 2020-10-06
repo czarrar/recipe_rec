@@ -1,9 +1,29 @@
 from flask import Flask, request, jsonify
-from recipe_rec import RecipeRec
+from libs_recipe_recs import RecipeRec
+from flask import render_template
 import numpy as np
 import traceback
 
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # Prevent caching
+
+@app.route('/choose', methods=['GET',])
+def choice_task():
+    """
+    This will be about displaying the task for the user.
+    """
+    return render_template('choice_task.html')
+
+@app.route('/choose_results', methods=['POST'])
+def choice_results():
+    import json
+    import pickle
+    response = request.form['data']
+    dat = json.loads(response)
+    dat = [ x for x in dat if x['ttype'] == 'stimuli' ]
+    print(dat)
+    pickle.dump(response, open('save.p', "wb"))
+    return jsonify(dat)
 
 @app.route('/proximity', methods=['GET', 'POST'])
 def proximity():
