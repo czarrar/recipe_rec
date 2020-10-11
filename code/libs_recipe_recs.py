@@ -100,6 +100,7 @@ class Tfidf_Wrapper(object):
         self.features_test = pd.DataFrame(Xtest.toarray(), columns = self.vectorizer.get_feature_names())
         return self.features_test
 
+
 # %% Recipe Rec
 class RecipeRec(object):
     """Recipe Recommendations"""
@@ -120,7 +121,7 @@ class RecipeRec(object):
         ingredients = ' '.join(items)
         return ingredients
 
-    def load_from_csv(self, recipe_file, to_clean=False, *args, **kwargs):
+    def read_csv(self, recipe_file, to_clean=False, *args, **kwargs):
         # recipe_file = ../data/20_ingredients.csv
         self.recipes = pd.read_csv(recipe_file, *args, **kwargs)
         if to_clean:
@@ -129,12 +130,17 @@ class RecipeRec(object):
         return
 
     def save_model(self, ofile):
-        pickle.dump( self, open( ofile, "wb" ) )
+        pickle.dump({'features': self.model.features, 'docs': self.model.docs,
+                        'recipes': self.recipes}, open( ofile, "wb" ) )
 
-    @staticmethod
-    def load_model(ifile):
-        cls = pickle.load( open(ifile, "rb") )
-        return cls
+    @classmethod
+    def load_from_file(cls, ifile):
+        dat = pickle.load( open(ifile, "rb") )
+        recs = cls()
+        recs.model.docs = dat['docs']
+        recs.model.features = dat['features']
+        recs.recipes = dat['recipes']
+        return recs
 
     def fit_model(self, reduce=True):
         if self.recipes is None:
