@@ -119,11 +119,12 @@ for (var i = 0; i < choice_pairs.length; i++) {
           },
   	stimulus: String.format(
       '<div>\
-        <div id="rbox"><img id="rstim" src="{0}" /></div>\
-        <div id="rbox"><img id="rstim" src="{1}" /></div>\
+        <div id="rbox"><img id="rstim" src="{0}" /><p>{2}</p></div>\
+        <div id="rbox"><img id="rstim" src="{1}" /><p>{3}</p></div>\
         <p class="subtitle2">Left (j) --------------------------- Right (k)</p>\
        </div>',
-      pair.left.image, pair.right.image
+      pair.left.image, pair.right.image,
+      pair.ingredient_left, pair.ingredient_right
     ),
   	choices: ['j', 'k'],
   	stimulus_duration: 5000,
@@ -151,16 +152,24 @@ for (var i = 0; i < choice_pairs.length; i++) {
       if (last_trial.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode('j')) {
         return(String.format(
           '<div>\
-            <div id="rbox_selected"><img id="rstim" src="{0}" /></div>\
-            <div id="rbox"><img id="rstim" src="{1}" /></div>\
+            <div id="rbox_selected">\
+              <img id="rstim" src="{0}" />\
+            </div>\
+            <div id="rbox">\
+              <img id="rstim" src="{1}" />\
+            </div>\
             <p class="subtitle2">&nbsp;</p>\
            </div>',
           last_trial.stim_left, last_trial.stim_right));
       } else if (last_trial.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode('k')) {
         return(String.format(
           '<div>\
-            <div id="rbox"><img id="rstim" src="{0}" /></div>\
-            <div id="rbox_selected"><img id="rstim" src="{1}" /></div>\
+            <div id="rbox">\
+              <img id="rstim" src="{0}" />\
+            </div>\
+            <div id="rbox_selected">\
+              <img id="rstim" src="{1}" />\
+            </div>\
             <p class="subtitle2">&nbsp;</p>\
            </div>',
           last_trial.stim_left, last_trial.stim_right));
@@ -196,10 +205,9 @@ function saveData(data){
       type:'post',
       cache: false,
       url: 'choose_results',
-      data: {
-          data: data
-      },
-      success: function(output) { console.log(output); } // write the result to javascript console
+      contentType: "application/json",
+      data: data,
+      success: function(output) { console.log(output); }
    });
 }
 

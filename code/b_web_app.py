@@ -18,11 +18,12 @@ def choice_task():
 def choice_results():
     import json
     import pickle
-    response = request.form['data']
-    dat = json.loads(response)
-    dat = [ x for x in dat if x['ttype'] == 'stimuli' ]
+    dat = request.json
+    #import pdb; pdb.set_trace()
+    #dat = json.loads(response)
+    #dat = [ x for x in dat if x['ttype'] == 'stimuli' ]
     print(dat)
-    pickle.dump(response, open('save.p', "wb"))
+    pickle.dump(dat, open('save.p', "wb"))
     return jsonify(dat)
 
 @app.route('/proximity', methods=['GET', 'POST'])
