@@ -13,6 +13,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem import WordNetLemmatizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import PCA
 
 import pickle
 
@@ -25,8 +26,6 @@ class Tfidf_Wrapper(object):
         self.docs = None
         self.features = None
         self.features_test = None
-        self._X = None
-        self._Xtest = None
 
         # For removing stop words like 'the'
         self._stop_words = set(nltk.corpus.stopwords.words('english'))
@@ -81,15 +80,24 @@ class Tfidf_Wrapper(object):
 
         return lems
 
-    def fit_transform(self, docs):
+    def fit_transform(self, docs, reduce=True):
         self.docs = docs
-        self._X = self.vectorizer.fit_transform(docs)
-        self.features = pd.DataFrame(self._X.toarray(), columns = self.vectorizer.get_feature_names())
+        X = self.vectorizer.fit_transform(docs).toarray()
+
+        if reduce == True:
+            pca = PCA(n_components = 0.95)
+            X_reduced = pca.fit_transform(X)
+            self.features = pd.DataFrame(X_reduced, dtype='float32')
+        else:
+            self.features = pd.DataFrame(X,
+                columns = self.vectorizer.get_feature_names(),
+                dtype='float32')
+
         return self.features
 
     def transform(self, docs):
-        self._Xtest = self.vectorizer.transform(docs)
-        self.features_test = pd.DataFrame(self._Xtest.toarray(), columns = self.vectorizer.get_feature_names())
+        Xtest = self.vectorizer.transform(docs)
+        self.features_test = pd.DataFrame(Xtest.toarray(), columns = self.vectorizer.get_feature_names())
         return self.features_test
 
 # %% Recipe Rec
@@ -128,10 +136,10 @@ class RecipeRec(object):
         cls = pickle.load( open(ifile, "rb") )
         return cls
 
-    def fit_model(self):
+    def fit_model(self, reduce=True):
         if self.recipes is None:
             raise Exception('Please load and build the model first')
-        self.model.fit_transform(self.recipes.ingredients)
+        self.model.fit_transform(self.recipes.ingredients, reduce)
         return
 
     def vectorize_ingredients(self, str_ingredients):
