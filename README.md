@@ -20,6 +20,6 @@ We want to represent each recipe as a vector. The file `code/20_Recipes_to_TFIDF
 
 Given that there are thousands of recipes, we can perform dimensionality reduction to group the recipes together in a meaningful way. This is done in `scripts_v2/22_viz_tfidf.ipynb`. PCA is first applied to the TFIDF vectors in order to reduce the dimensionality of the features (from ~3k word vocabulary to ~1k components), and then k-means is applied to the PCA-reduced data and the silhouette width is used to determine the ideal cluster number.
 
-### App
+## App
 
 The Flask app is located in `code/b_web_app.py`. Presently it shows a pair of recipe images to the user and gets their response.
